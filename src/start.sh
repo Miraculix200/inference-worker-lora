@@ -35,11 +35,15 @@ else
     echo "start.sh: WARNING: Caching is disabled. Please visit the inference-worker README and docs to learn more."
 fi
 
-# check if $LLAMA_CACHED_LORA is set and not empty (LoRA adapter caching)
-if [ -n "$LLAMA_CACHED_LORA" ]; then
+# Check for LoRA adapter (baked-in or cached)
+BAKED_LORA="/work/lora/tesseract-spark-official-adapter.gguf"
+if [ -f "$BAKED_LORA" ]; then
+    echo "start.sh: Using baked-in LoRA adapter"
+    CACHED_LORA_ARGS="--lora $BAKED_LORA"
+    echo "start.sh: LoRA arguments: $CACHED_LORA_ARGS"
+elif [ -n "$LLAMA_CACHED_LORA" ]; then
     echo "start.sh: LoRA caching is enabled. Finding cached LoRA adapter path..."
     find_cached_lora
-
     echo "start.sh: Using cached LoRA with arguments: $CACHED_LORA_ARGS"
 fi
 
