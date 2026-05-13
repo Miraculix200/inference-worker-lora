@@ -15,9 +15,14 @@ cleanup() {
 }
 
 CACHED_LLAMA_ARGS=""
+CACHED_LORA_ARGS=""
 
 find_cached_path() {
     CACHED_LLAMA_ARGS="-m $(python ./find_cached.py $LLAMA_CACHED_MODEL $LLAMA_CACHED_GGUF_PATH)"
+}
+
+find_cached_lora() {
+    CACHED_LORA_ARGS="--lora $(python ./find_cached.py $LLAMA_CACHED_LORA $LLAMA_CACHED_LORA_PATH)"
 }
 
 # check if $LLAMA_CACHED_MODEL is set and not empty
@@ -28,6 +33,14 @@ if [ -n "$LLAMA_CACHED_MODEL" ]; then
     echo "start.sh: Using cached model with arguments: $CACHED_LLAMA_ARGS"
 else
     echo "start.sh: WARNING: Caching is disabled. Please visit the inference-worker README and docs to learn more."
+fi
+
+# check if $LLAMA_CACHED_LORA is set and not empty (LoRA adapter caching)
+if [ -n "$LLAMA_CACHED_LORA" ]; then
+    echo "start.sh: LoRA caching is enabled. Finding cached LoRA adapter path..."
+    find_cached_lora
+
+    echo "start.sh: Using cached LoRA with arguments: $CACHED_LORA_ARGS"
 fi
 
 # check if $LLAMA_SERVER_CMD_ARGS is set
@@ -56,12 +69,12 @@ echo "start.sh: Stopping existing llama-server instances (if any)..."
 # we have a string with all the command line arguments in the env var LLAMA_SERVER_CMD_ARGS;
 # it contains a.e. "-hf modelname --ctx-size 4096 -ngl 999".
 
-echo "start.sh: Running /app/llama-server $CACHED_LLAMA_ARGS $LLAMA_SERVER_CMD_ARGS --port 3098"
+echo "start.sh: Running /app/llama-server $CACHED_LLAMA_ARGS $CACHED_LORA_ARGS $LLAMA_SERVER_CMD_ARGS --port 3098"
 
 touch llama.server.log
 
 # We need to pass these arguments to llama-server verbatim.
-LD_LIBRARY_PATH=/app /app/llama-server $CACHED_LLAMA_ARGS $LLAMA_SERVER_CMD_ARGS --port 3098 2>&1 | tee llama.server.log &
+LD_LIBRARY_PATH=/app /app/llama-server $CACHED_LLAMA_ARGS $CACHED_LORA_ARGS $LLAMA_SERVER_CMD_ARGS --port 3098 2>&1 | tee llama.server.log &
 
 LLAMA_SERVER_PID=$! # store the process ID (PID) of the background command
 

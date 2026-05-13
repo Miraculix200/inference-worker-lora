@@ -61,3 +61,42 @@ We will now integrate this into our workflow. Hang tight.
     ```
 
 4.  Done! The rest will be handled by the inference worker automatically. When the worker starts, it will resolve the cached model path and launch `llama-server` with the correct arguments.
+
+## Using cached LoRA adapters
+
+**New feature!** You can also cache LoRA adapters alongside the base model. This is useful for fine-tuned models deployed as adapter weights.
+
+### Step-by-step guide for LoRA adapters
+
+1.  Configure the base model caching as described above (steps 1-3).
+
+2.  Add the LoRA adapter to the RunPod Model field alongside the base model URL:
+    
+    Example: `https://huggingface.co/flux777/tesseract-spark-official`
+
+3.  Set the following additional environment variables:
+
+    ```bash
+    LLAMA_CACHED_LORA=flux777/tesseract-spark-official
+    LLAMA_CACHED_LORA_PATH=tesseract-spark-official-adapter.gguf
+    ```
+
+4.  The worker will now cache both the base model and the LoRA adapter, passing `--lora <cached_path>` to llama-server automatically.
+
+### Example full configuration (base model + LoRA)
+
+**Model field:**
+```
+https://huggingface.co/google/gemma-4-26B-A4B-it-GGUF
+https://huggingface.co/flux777/tesseract-spark-official
+```
+
+**Environment variables:**
+```bash
+LLAMA_CACHED_MODEL=google/gemma-4-26B-A4B-it-GGUF
+LLAMA_CACHED_GGUF_PATH=gemma-4-26b-a4b-it-Q4_K_M.gguf
+LLAMA_CACHED_LORA=flux777/tesseract-spark-official
+LLAMA_CACHED_LORA_PATH=tesseract-spark-official-adapter.gguf
+LLAMA_SERVER_CMD_ARGS=--ctx-size 4096 -ngl 999 -fa on
+MAX_CONCURRENCY=4
+```
