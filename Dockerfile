@@ -36,14 +36,9 @@ ADD ./src /work
 RUN pip install -r ./requirements.txt && chmod +x /work/start.sh
 
 # Download LoRA adapter (11MB) into the image
-RUN mkdir -p /work/lora && python3.11 -c "\
-from huggingface_hub import hf_hub_download; \
-hf_hub_download( \
-    repo_id='flux777/tesseract-spark-official', \
-    filename='tesseract-spark-official-adapter.gguf', \
-    local_dir='/work/lora' \
-); \
-print('✓ LoRA adapter baked into image')"
+RUN pip install huggingface_hub && \
+    mkdir -p /work/lora && \
+    python3.11 -c "from huggingface_hub import hf_hub_download; hf_hub_download(repo_id='flux777/tesseract-spark-official', filename='tesseract-spark-official-adapter.gguf', local_dir='/work/lora'); print('✓ LoRA adapter baked into image')"
 
 # Set the entrypoint
 ENTRYPOINT ["/bin/sh", "-c", "/work/start.sh"]
