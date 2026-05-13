@@ -43,5 +43,10 @@ RUN echo "Installing huggingface_hub..." && \
     echo "Downloading LoRA adapter..." && \
     python3.11 -c "from huggingface_hub import hf_hub_download; hf_hub_download(repo_id='flux777/tesseract-spark-official', filename='tesseract-spark-official-adapter.gguf', local_dir='/work/lora'); print('✓ LoRA adapter baked into image')"
 
+# Set default environment variables for testing (can be overridden at runtime)
+ENV LLAMA_CACHED_MODEL=unsloth/gemma-4-26B-A4B-it-GGUF
+ENV LLAMA_CACHED_GGUF_PATH=gemma-4-26b-a4b-it-UD-Q4_K_M.gguf
+ENV LLAMA_SERVER_CMD_ARGS="--ctx-size 4096 -ngl 999 -fa on"
+
 # Set the entrypoint
 ENTRYPOINT ["/bin/sh", "-c", "/work/start.sh"]
