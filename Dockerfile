@@ -38,4 +38,4 @@ ADD ./src /work
 RUN pip install --no-cache-dir -r ./requirements.txt && chmod +x /work/start.sh
 
 # Set the entrypoint
-ENTRYPOINT ["/bin/sh", "-c", "/work/start.sh"]
+ENTRYPOINT ["/bin/bash", "/work/start.sh"]
