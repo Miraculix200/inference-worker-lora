@@ -33,8 +33,11 @@ WORKDIR /work
 # Add ./src as /work
 ADD ./src /work
 
+# Force rebuild - timestamp cache bust
+ARG CACHE_BUST=20260514_1643
+RUN echo "Cache bust: $CACHE_BUST"
+
 # Install runpod and its dependencies
-# Cache bust: 2026-05-14-1426
 RUN pip install --no-cache-dir -r ./requirements.txt && chmod +x /work/start.sh
 
 # Set the entrypoint
