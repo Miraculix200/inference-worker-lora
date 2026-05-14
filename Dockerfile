@@ -1,4 +1,5 @@
 # Use an official ggml-org/llama.cpp image as the base image
+# Rebuild trigger: 2026-05-14 14:20 - LoRA download fix
 FROM ghcr.io/ggml-org/llama.cpp:server-cuda
 
 ENV PYTHONUNBUFFERED=1
