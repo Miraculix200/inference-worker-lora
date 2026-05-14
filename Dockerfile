@@ -34,7 +34,8 @@ WORKDIR /work
 ADD ./src /work
 
 # Install runpod and its dependencies
-RUN pip install -r ./requirements.txt && chmod +x /work/start.sh
+# Cache bust: 2026-05-14-1426
+RUN pip install --no-cache-dir -r ./requirements.txt && chmod +x /work/start.sh
 
 # Set the entrypoint
 ENTRYPOINT ["/bin/sh", "-c", "/work/start.sh"]
