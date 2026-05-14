@@ -22,7 +22,31 @@ find_cached_path() {
 }
 
 find_cached_lora() {
-    CACHED_LORA_ARGS="--lora $(python ./find_cached.py $LLAMA_CACHED_LORA $LLAMA_CACHED_LORA_PATH)"
+    LORA_PATH=$(python ./find_cached.py $LLAMA_CACHED_LORA $LLAMA_CACHED_LORA_PATH)
+    if [ "$LORA_PATH" != "None" ] && [ -f "$LORA_PATH" ]; then
+        CACHED_LORA_ARGS="--lora $LORA_PATH"
+    else
+        echo "start.sh: WARNING: LoRA adapter not found in cache. Will download on first use..."
+        # Download the LoRA adapter from HuggingFace
+        python3 -c "
+from huggingface_hub import hf_hub_download
+import os
+lora_path = hf_hub_download(
+    repo_id='$LLAMA_CACHED_LORA',
+    filename='$LLAMA_CACHED_LORA_PATH',
+    cache_dir='/runpod-volume/huggingface-cache'
+)
+print(lora_path, end='')
+" > /tmp/lora_path.txt
+        LORA_PATH=$(cat /tmp/lora_path.txt)
+        if [ -f "$LORA_PATH" ]; then
+            CACHED_LORA_ARGS="--lora $LORA_PATH"
+            echo "start.sh: Downloaded LoRA adapter to: $LORA_PATH"
+        else
+            echo "start.sh: ERROR: Failed to download LoRA adapter"
+            CACHED_LORA_ARGS=""
+        fi
+    fi
 }
 
 # check if $LLAMA_CACHED_MODEL is set and not empty
