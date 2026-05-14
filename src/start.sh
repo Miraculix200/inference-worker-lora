@@ -6,10 +6,6 @@ echo "=== START.SH ENTRYPOINT REACHED ==="
 # fail on error:
 set -e -o pipefail
 
-# WORKAROUND: RunPod's Docker cache is broken, install huggingface_hub at runtime
-echo "start.sh: Installing huggingface_hub (RunPod cache workaround)..."
-pip install --quiet huggingface_hub
-
 # This script starts the llama-server with the command line arguments
 # specified in the environment variable LLAMA_SERVER_CMD_ARGS, ensuring
 # that the server listens on port 3098. It also starts the handler.py
@@ -35,7 +31,7 @@ find_cached_lora() {
     else
         echo "start.sh: WARNING: LoRA adapter not found in cache. Will download on first use..."
         # Download the LoRA adapter from HuggingFace
-        python3 -c "
+        python -c "
 from huggingface_hub import hf_hub_download
 import os
 lora_path = hf_hub_download(
