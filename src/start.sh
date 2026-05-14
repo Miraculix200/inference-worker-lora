@@ -1,5 +1,8 @@
 #!/bin/bash
 
+echo "=== START.SH ENTRYPOINT REACHED ===" >&2
+echo "=== START.SH ENTRYPOINT REACHED ==="
+
 # fail on error:
 set -e -o pipefail
 
@@ -141,4 +144,5 @@ done
 
 echo "start.sh: llama-server is up and running, delegating to the handler script."
 
-python -u handler.py $1
+echo "start.sh: About to execute: python -u handler.py $1"
+exec python -u handler.py $1
