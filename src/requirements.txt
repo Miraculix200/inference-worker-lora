@@ -1,3 +1,4 @@
 runpod
 python-dotenv
 openai
+huggingface_hub
